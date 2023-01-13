@@ -15,7 +15,7 @@ export interface Product {
     createdAt: number
     currency: "USD"|"HUF"|"EUR"
     type: "Course"| "Program"
-    relatedCourses: []|object[] 
+    relatedCourses: []|Product[] 
 }
 
 
@@ -82,7 +82,7 @@ function getTitles(products: Product[]) :string[] {
 
 // This two functions just here to check the proper return type in the tests.
 const courses = filterCourses(products)
-const titles = getTitles(products)
+const titles1 = getTitles(products)
 
 
 // Exercise 4,
@@ -109,8 +109,8 @@ const price = formatPrice(products[0])
 // TODO: remove the "any" type, and add a concerete type for these basic primitives
 // How they are working, if you remove all type definitions? How inference is working here?
 
-let price: number /* add the correcy type annotation here instead of any */
-price = 100.5
+let price2: number /* add the correcy type annotation here instead of any */
+price2 = 100.5
 
 let title: string
 title = "How to Hack NASA with HTML?"
@@ -148,8 +148,8 @@ type cat = {
 
 const anyProduct: cat = {name: 'Mr. Fluff', kind: 'British Shorthair', age: 4}
 const productTitle = anyProduct.title
-const priceWithTaxes = anyProduct.price * (1.25)
-const upperCaseTitle = anyProduct.price.toUpperCase()
+const priceWithTaxes = anyProduct.price ? anyProduct.price * (1.25) : 0
+const upperCaseTitle = typeof anyProduct.title === 'string' ? anyProduct.title.toUpperCase() : '';
 
 // Exercise 3) Anonymus Functions
 
@@ -192,8 +192,7 @@ const shoppingCartCourse: Course = {
 //  creatively, in the Narrowing chapter we will see a lot of
 //  patterns to handle these cases.
 const getTax = (course: Course) => {
-      
-    return course.price * 0.25
+  return +course.price * 0.25
 }
 
 // Exercise 5) Types Aliases
@@ -207,7 +206,9 @@ const getTax = (course: Course) => {
 //  Note type alias can be used for any type, not just
 //  objects. Check the examples in the handbook.
 type Account = {
-
+  id: number
+  name: string
+  currency: USD
 }
 
 const account: Account = {
@@ -234,8 +235,10 @@ const accountCurrency = getCurrency(account)
 //  In our application we trust in the API. Assert it to an 
 //  Account type (declared above) to be able to use it as an Account
 //  in the other parts of the application.  
-const fetchAccount = (id: number): object => ({id: id, name: "Some Account", currency: "USD"})
-const currentAccount = fetchAccount(4) /* add Type Assertion here */
+
+
+const fetchAccount = (id: number): Account => ({id: id, name: "Some Account", currency: "USD"})
+const currentAccount = <Account>fetchAccount(4) /* add Type Assertion here */
 const currentAccountName = currentAccount.name
 
 // Exercies 6) Literal types
@@ -254,7 +257,7 @@ type EUR = 'EUR'
 //  both EUR and USD. How can you define two possible
 //  types for one type? (we have seen before
 //  with numbers and strings).
-type Currency = string
+type Currency = USD | EUR
 const firstCurrency: Currency = 'USD';
 const secondCurrency: Currency = 'EUR'
 const usd: USD = firstCurrency;
@@ -274,7 +277,7 @@ const someAccount = {
     currency: "USD"
 }
 
-const getSomeCurrency = (account: {currency: Currency}) => account.currency
+const getSomeCurrency = (account: {name: string, currency: string}) => account.currency
 const someCurrency = getSomeCurrency(someAccount)
 
 // Exercise 7) null and undefined
@@ -292,7 +295,7 @@ const someCurrency = getSomeCurrency(someAccount)
 //  the type errors.
 type AccountWithOrWithoutCurrency = {
     name: string,
-    currency: 'USD' | 'EUR' | undefined
+    currency: 'USD' | 'EUR' | null
 }
 const removeCurrency = (account: AccountWithOrWithoutCurrency): AccountWithOrWithoutCurrency => {
     return {
